@@ -16,13 +16,30 @@ const DrumPad = ({ label, keyTrigger, onTrigger, soundSrc }: DrumPadProps) => {
   useEffect(() => {
     // Create audio element
     audioRef.current = new Audio(soundSrc);
-  }, [soundSrc]);
+    
+    // Set up error handling for audio loading
+    if (audioRef.current) {
+      audioRef.current.onerror = () => {
+        console.error(`Error loading audio for ${label}`);
+      };
+    }
+    
+    return () => {
+      // Clean up audio resources when component unmounts
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, [soundSrc, label]);
 
   const playSound = () => {
     if (audioRef.current) {
       // Reset audio to beginning if it's already playing
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(e => console.error("Error playing audio:", e));
+      audioRef.current.play().catch(e => {
+        console.error(`Error playing ${label} sound:`, e);
+      });
     }
     setIsActive(true);
     onTrigger();
