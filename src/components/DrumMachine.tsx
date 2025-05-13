@@ -2,6 +2,11 @@
 import { useState, useEffect } from 'react';
 import DrumPad from './DrumPad';
 
+// Import audio files
+import kickSound from '../audio/kick.wav';
+import snareSound from '../audio/snare.wav';
+import hihatSound from '../audio/hihat.wav';
+
 const DrumMachine = () => {
   const [beatCount, setBeatCount] = useState(0);
 
@@ -21,9 +26,9 @@ const DrumMachine = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
-          <DrumPad label="Kick" keyTrigger="q" onTrigger={() => playSound('kick')} />
-          <DrumPad label="Snare" keyTrigger="w" onTrigger={() => playSound('snare')} />
-          <DrumPad label="Hi-Hat" keyTrigger="e" onTrigger={() => playSound('hihat')} />
+          <DrumPad label="Kick" keyTrigger="q" onTrigger={() => playSound('kick')} soundSrc={kickSound} />
+          <DrumPad label="Snare" keyTrigger="w" onTrigger={() => playSound('snare')} soundSrc={snareSound} />
+          <DrumPad label="Hi-Hat" keyTrigger="e" onTrigger={() => playSound('hihat')} soundSrc={hihatSound} />
         </div>
 
         <div className="text-center mt-12 text-gray-400">

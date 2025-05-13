@@ -1,38 +1,48 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface DrumPadProps {
   label: string;
   keyTrigger: string;
   onTrigger: () => void;
+  soundSrc: string;
 }
 
-const DrumPad = ({ label, keyTrigger, onTrigger }: DrumPadProps) => {
+const DrumPad = ({ label, keyTrigger, onTrigger, soundSrc }: DrumPadProps) => {
   const [isActive, setIsActive] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === keyTrigger.toLowerCase()) {
-        setIsActive(true);
-        onTrigger();
-        setTimeout(() => setIsActive(false), 100);
-      }
-    };
+    // Create audio element
+    audioRef.current = new Audio(soundSrc);
+  }, [soundSrc]);
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [keyTrigger, onTrigger]);
-
-  const handleClick = () => {
+  const playSound = () => {
+    if (audioRef.current) {
+      // Reset audio to beginning if it's already playing
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => console.error("Error playing audio:", e));
+    }
     setIsActive(true);
     onTrigger();
     setTimeout(() => setIsActive(false), 100);
   };
 
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === keyTrigger.toLowerCase()) {
+        playSound();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [keyTrigger]);
+
   return (
     <button
-      onClick={handleClick}
+      onClick={playSound}
       className={cn(
         "w-32 h-32 rounded-full transition-all duration-200 flex items-center justify-center",
         "bg-gradient-to-br from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600",
